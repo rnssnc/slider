@@ -19,6 +19,11 @@ body {
   font-size: 22px;
 }
 
+.video {
+  width: 100%;
+  height: 100vh;
+}
+
 .slider {
   width: 100%;
   height: 100%;
