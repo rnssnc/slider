@@ -37,7 +37,6 @@ class Slider {
   }
 
   shiftSlide(count) {
-    console.log(this.index);
     this.transformValue += -count * this.slideWidth;
     this.track.style.transform = `translateX(${this.transformValue}px)`;
     this.index += count;
