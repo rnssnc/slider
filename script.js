@@ -55,7 +55,6 @@ class Slider {
       this.track.setPointerCapture(e.pointerId);
 
       this.track.addEventListener('pointermove', this.handlePointerMove);
-
       this.track.addEventListener('pointerup', this.handlePointerUp);
     });
   }
@@ -66,11 +65,9 @@ class Slider {
   };
 
   prevSlide = (e) => {
-    console.log('always');
     if (this.index >= this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
   };
   handlePointerUp = (e) => {
-    this.track.releasePointerCapture(e.pointerId);
     this.track.removeEventListener('pointermove', this.handlePointerMove);
     if (this.track.style.transition != null)
       if (this.transformValue + this.newLeft < this.transformValue) this.nextSlide(e);
@@ -80,7 +77,7 @@ class Slider {
 
   handlePointerMove = (e) => {
     this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
-    console.log(this.newLeft);
+    // console.log(this.newLeft);
     // this.posX2 = this.posX1 - e.clientX;
     // this.posX1 = e.clientX;
     // console.log(this.newLeft);
@@ -94,7 +91,7 @@ class Slider {
     // if (this.newLeft > this.rightEdge) {
     //   this.newLeft = this.rightEdge;
     // }
-    console.log(this.transformValue + this.newLeft);
+    // console.log(this.transformValue + this.newLeft);
     this.track.style.transform = `translateX(${this.transformValue + this.newLeft}px)`;
   };
 
@@ -144,7 +141,6 @@ class Slider {
   }
 
   shiftSlide(count) {
-    console.log(count);
     this.transformValue += -count * this.slideWidth;
     this.track.style.transition = `transform ${this.transitionTime}s`;
     this.track.style.transform = `translateX(${this.transformValue}px)`;
