@@ -46,7 +46,7 @@ body {
   backface-visibility: hidden;
   touch-action: none;
   float: left;
-  height: 100vh;
+  height: 100%;
   cursor: pointer;
   display: flex;
   flex-direction: column;

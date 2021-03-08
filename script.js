@@ -48,7 +48,6 @@ class Slider {
     this.posX1 = 0;
     this.posX2 = 0;
     this.track.addEventListener('pointerdown', (e) => {
-<<<<<<< HEAD
       if (this.track.style.transition == '') {
         e.preventDefault(); // prevent selection start (browser action)
 
@@ -60,18 +59,8 @@ class Slider {
         this.track.setPointerCapture(e.pointerId);
 
         this.track.addEventListener('pointermove', this.handlePointerMove);
-        this.track.addEventListener('pointerup', this.handlePointerUp);
+        document.addEventListener('pointerup', this.handlePointerUp);
       }
-=======
-      e.preventDefault(); // prevent selection start (browser action)
-
-      this.shiftX = e.clientX - this.track.getBoundingClientRect().left;
-      this.posX1 = e.clientX;
-      this.track.setPointerCapture(e.pointerId);
-
-      this.track.addEventListener('pointermove', this.handlePointerMove);
-      this.track.addEventListener('pointerup', this.handlePointerUp);
->>>>>>> eca87ee4b193d48c5de706806e2c267a90904b37
     });
   }
 
@@ -87,21 +76,15 @@ class Slider {
   handlePointerUp = (e) => {
     this.track.removeEventListener('pointermove', this.handlePointerMove);
     if (this.track.style.transition != null)
-      if (this.transformValue + this.posX2 < this.transformValue) this.nextSlide(e);
+      if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
       else this.prevSlide(e);
-    this.track.removeEventListener('pointerup', this.handlePointerUp);
+    document.removeEventListener('pointerup', this.handlePointerUp);
   };
 
   handlePointerMove = (e) => {
-<<<<<<< HEAD
     // this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
     // console.log(this.newLeft);
     this.posX2 = e.clientX - this.posX1;
-=======
-    this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
-    // console.log(this.newLeft);
-    // this.posX2 = this.posX1 - e.clientX;
->>>>>>> eca87ee4b193d48c5de706806e2c267a90904b37
     // this.posX1 = e.clientX;
     // console.log(this.newLeft);
     // console.log(this.transformValue);
@@ -115,12 +98,8 @@ class Slider {
     //   this.newLeft = this.rightEdge;
     // }
     // console.log(this.transformValue + this.newLeft);
-<<<<<<< HEAD
     // console.log(this.newLeft);
     this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
-=======
-    this.track.style.transform = `translateX(${this.transformValue + this.newLeft}px)`;
->>>>>>> eca87ee4b193d48c5de706806e2c267a90904b37
   };
 
   handleTransitionEnd = (e) => {
