@@ -39,7 +39,6 @@ body {
   display: block;
   margin-left: auto;
   margin-right: auto;
-  transition: all 1s;
 }
 
 .slide {
@@ -55,23 +54,18 @@ body {
   border-radius: 2px;
 }
 
-.slide:nth-child(2),
-.slide:nth-child(7) {
-  background: #ffcf47;
-}
-.slide:nth-child(1),
-.slide:nth-child(6) {
-  background: #7adcef;
-}
-.slide:nth-child(3) {
+.slide:nth-child(even) {
   background: #3cff96;
 }
-.slide:nth-child(4) {
+.slide:nth-child(odd) {
   background: #a78df5;
 }
-.slide:nth-child(5) {
+.slide:nth-child(3n) {
   background: #ff8686;
 }
+/* .slide:nth-child(5) {
+  background: #ff8686;
+} */
 
 .control {
   position: absolute;
