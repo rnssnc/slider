@@ -43,6 +43,7 @@ body {
 }
 
 .slide {
+  backface-visibility: hidden;
   touch-action: none;
   float: left;
   height: 100vh;
