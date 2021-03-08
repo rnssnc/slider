@@ -48,15 +48,19 @@ class Slider {
     this.posX1 = 0;
     this.posX2 = 0;
     this.track.addEventListener('pointerdown', (e) => {
-      e.preventDefault(); // prevent selection start (browser action)
+      if (this.track.style.transition == '') {
+        e.preventDefault(); // prevent selection start (browser action)
 
-      this.shiftX = e.clientX - this.track.getBoundingClientRect().left;
-      this.posX1 = e.clientX;
-      this.track.setPointerCapture(e.pointerId);
+        // this.shiftX = e.clientX - this.track.getBoundingClientRect().left;
+        // console.log(e.clientX);
+        // console.log(this.track.getBoundingClientRect().left);
+        this.shiftX = 0;
+        this.posX1 = e.clientX;
+        this.track.setPointerCapture(e.pointerId);
 
-      this.track.addEventListener('pointermove', this.handlePointerMove);
-
-      this.track.addEventListener('pointerup', this.handlePointerUp);
+        this.track.addEventListener('pointermove', this.handlePointerMove);
+        this.track.addEventListener('pointerup', this.handlePointerUp);
+      }
     });
   }
 
@@ -66,22 +70,21 @@ class Slider {
   };
 
   prevSlide = (e) => {
-    console.log('always');
     if (this.index >= this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
   };
+
   handlePointerUp = (e) => {
-    this.track.releasePointerCapture(e.pointerId);
     this.track.removeEventListener('pointermove', this.handlePointerMove);
     if (this.track.style.transition != null)
-      if (this.transformValue + this.newLeft < this.transformValue) this.nextSlide(e);
+      if (this.transformValue + this.posX2 < this.transformValue) this.nextSlide(e);
       else this.prevSlide(e);
     this.track.removeEventListener('pointerup', this.handlePointerUp);
   };
 
   handlePointerMove = (e) => {
-    this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
-    console.log(this.newLeft);
-    // this.posX2 = this.posX1 - e.clientX;
+    // this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
+    // console.log(this.newLeft);
+    this.posX2 = e.clientX - this.posX1;
     // this.posX1 = e.clientX;
     // console.log(this.newLeft);
     // console.log(this.transformValue);
@@ -94,8 +97,9 @@ class Slider {
     // if (this.newLeft > this.rightEdge) {
     //   this.newLeft = this.rightEdge;
     // }
-    console.log(this.transformValue + this.newLeft);
-    this.track.style.transform = `translateX(${this.transformValue + this.newLeft}px)`;
+    // console.log(this.transformValue + this.newLeft);
+    // console.log(this.newLeft);
+    this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
   };
 
   handleTransitionEnd = (e) => {
@@ -144,7 +148,6 @@ class Slider {
   }
 
   shiftSlide(count) {
-    console.log(count);
     this.transformValue += -count * this.slideWidth;
     this.track.style.transition = `transform ${this.transitionTime}s`;
     this.track.style.transform = `translateX(${this.transformValue}px)`;
