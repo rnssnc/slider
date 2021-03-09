@@ -51,7 +51,7 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  transition: all 1s;
+  /* transition: all 1s; */
   position: relative;
   background: #ffcf47;
   border-radius: 2px;

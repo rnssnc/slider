@@ -7,44 +7,21 @@ class Slider {
     this.slidesToScroll = options.slidesToScroll;
     this.infinite = options.infinite;
     this.slides = this.track.children;
-    this.transitionTime = 0.7;
+    this.transitionTime = 0.4;
 
-    this.sliderWidth = this.slider.getBoundingClientRect().width;
-    this.slideWidth = this.sliderWidth / this.slidesToShow;
+    this.buttonNext = document.querySelector('.control.next');
+    this.buttonPrev = document.querySelector('.control.prev');
 
-    this.defaultTranslate = 0;
+    this.isClonesAdded = false;
     this.defaultLength = this.slides.length;
-    this.transformValue = 0;
-    this.widthWithoutClones = this.slides.length * this.slideWidth;
-    this.index = this.slidesToShow;
 
-    if (this.infinite) {
-      // Add clones
-      this.addClones(this.slidesToShow);
-      this.transformValue = this.defaultTranslate;
-      // Listeners
-      this.buttonNext = document.querySelector('.control.next').addEventListener('click', this.nextSlide);
+    this.setupSlider();
 
-      this.buttonPrev = document.querySelector('.control.prev').addEventListener('click', this.prevSlide);
-    } else {
-      this.buttonNext = document.querySelector('.control.next').addEventListener('click', (e) => {
-        if (this.index < this.slides.length) this.shiftSlide(1) || e.preventDefault();
-      });
+    this.buttonNext.addEventListener('click', this.nextSlide);
+    this.buttonPrev.addEventListener('click', this.prevSlide);
 
-      this.buttonPrev = document.querySelector('.control.prev').addEventListener('click', (e) => {
-        if (this.index > this.slidesToShow) this.shiftSlide(-1) || e.preventDefault();
-      });
-    }
-
-    this.setTrackWidth(this.track);
-
-    // createTrack();
-    this.fitSlides(this.slides);
-
-    this.track.addEventListener('transitionend', this.handleTransitionEnd);
-
-    this.shiftX = 0;
-    this.newLeft = 0;
+    // this.shiftX = 0;
+    // this.newLeft = 0;
     this.posX1 = 0;
     this.posX2 = 0;
     this.track.addEventListener('pointerdown', (e) => {
@@ -62,22 +39,63 @@ class Slider {
         document.addEventListener('pointerup', this.handlePointerUp);
       }
     });
-  }
 
-  nextSlide = (e) => {
-    if (this.index < this.slides.length - this.slidesToShow)
-      this.shiftSlide(this.slidesToScroll) || e.preventDefault();
+    window.addEventListener('resize', this.setupSlider);
+  }
+  setupSlider = () => {
+    this.sliderWidth = this.slider.getBoundingClientRect().width;
+    this.slideWidth = this.sliderWidth / this.slidesToShow;
+
+    this.defaultTranslate = 0;
+    this.transformValue = 0;
+    this.widthWithoutClones = this.defaultLength * this.slideWidth;
+    this.index = this.slidesToShow;
+
+    //Different listeners for infinite
+    this.handleInfinite();
+
+    this.setTrackWidth(this.track);
+    this.track.addEventListener('transitionend', this.handleTransitionEnd);
+
+    // createTrack();
+    this.fitSlides(this.slides);
   };
 
-  prevSlide = (e) => {
-    if (this.index >= this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+  handleInfinite = () => {
+    if (this.infinite) {
+      this.addClones(this.slidesToShow);
+      this.transformValue = this.defaultTranslate;
+
+      this.nextSlide = (e) => {
+        if (this.index < this.slides.length - this.slidesToShow)
+          this.shiftSlide(this.slidesToScroll) || e.preventDefault();
+      };
+
+      this.prevSlide = (e) => {
+        if (this.index >= this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+      };
+    } else {
+      this.nextSlide = (e) => {
+        if (this.index <= this.slides.length - this.slidesToShow)
+          this.shiftSlide(this.slidesToScroll) || e.preventDefault();
+      };
+
+      this.prevSlide = (e) => {
+        if (this.index > this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+      };
+    }
   };
 
   handlePointerUp = (e) => {
     this.track.removeEventListener('pointermove', this.handlePointerMove);
-    if (this.track.style.transition != null)
+    if (this.infinite) {
+      if (this.track.style.transition != null)
+        if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
+        else this.prevSlide(e);
+    } else {
       if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
       else this.prevSlide(e);
+    }
     document.removeEventListener('pointerup', this.handlePointerUp);
   };
 
@@ -99,6 +117,11 @@ class Slider {
     // }
     // console.log(this.transformValue + this.newLeft);
     // console.log(this.newLeft);
+    if (!this.infinite)
+      if (this.index === this.slides.length && this.transformValue + this.posX2 <= this.transformValue)
+        return;
+      else if (this.index == this.slidesToShow && this.transformValue + this.posX2 > this.transformValue)
+        return;
     this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
   };
 
@@ -106,7 +129,6 @@ class Slider {
     if (e.propertyName == 'transform') {
       this.track.style.transition = null;
       if (this.infinite && this.index == this.slides.length - this.slidesToShow) {
-        console.log('rightyo');
         this.transformValue = this.defaultTranslate;
         this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
         this.index = this.slidesToShow;
@@ -132,8 +154,12 @@ class Slider {
       prependNode.push(prependClone);
       this.defaultTranslate -= this.slideWidth;
     }
-    this.track.append(...appendNode);
-    this.track.prepend(...prependNode.reverse());
+    if (!this.isClonesAdded) {
+      this.track.append(...appendNode);
+      this.track.prepend(...prependNode.reverse());
+
+      this.isClonesAdded = true;
+    }
     this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
   }
 
@@ -149,6 +175,7 @@ class Slider {
 
   shiftSlide(count) {
     this.transformValue += -count * this.slideWidth;
+
     this.track.style.transition = `transform ${this.transitionTime}s`;
     this.track.style.transform = `translateX(${this.transformValue}px)`;
     this.index += count;
