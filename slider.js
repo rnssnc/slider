@@ -39,6 +39,8 @@ export class Slider {
         this.posX1 = e.clientX;
         this.track.setPointerCapture(e.pointerId);
 
+        console.log(e.pointerId);
+
         this.track.addEventListener('pointermove', this.handlePointerMove);
         document.addEventListener('pointerup', this.handlePointerUp);
       }
@@ -107,11 +109,15 @@ export class Slider {
         if (this.transformValue + this.posX2 < this.transformValue) this.nextSlide(e);
         else if (this.transformValue + this.posX2 > this.transformValue) this.prevSlide(e);
     } else {
-      if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
-      else this.prevSlide(e);
+      if (this.transformValue + this.posX2 < this.transformValue) this.nextSlide(e);
+      else if (this.transformValue + this.posX2 > this.transformValue) this.prevSlide(e);
     }
     this.posX1 = 0;
     this.posX2 = 0;
+
+    console.log(e.pointerId);
+
+    this.track.releasePointerCapture(e.pointerId);
     document.removeEventListener('pointerup', this.handlePointerUp);
   };
 
