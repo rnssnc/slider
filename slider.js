@@ -7,7 +7,7 @@ export class Slider {
     this.slidesToScroll = options.slidesToScroll;
     this.infinite = options.infinite;
     this.slides = this.track.children;
-    this.transitionTime = 0.4;
+    this.transitionTime = 0.3;
 
     this.setupClasses();
 
@@ -104,12 +104,14 @@ export class Slider {
     this.track.removeEventListener('pointermove', this.handlePointerMove);
     if (this.infinite) {
       if (this.track.style.transition != null)
-        if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
-        else this.prevSlide(e);
+        if (this.transformValue + this.posX2 < this.transformValue) this.nextSlide(e);
+        else if (this.transformValue + this.posX2 > this.transformValue) this.prevSlide(e);
     } else {
       if (this.transformValue + this.posX2 <= this.transformValue) this.nextSlide(e);
       else this.prevSlide(e);
     }
+    this.posX1 = 0;
+    this.posX2 = 0;
     document.removeEventListener('pointerup', this.handlePointerUp);
   };
 
