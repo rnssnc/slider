@@ -96,11 +96,11 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index >= this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index >= this.slidesToScroll) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
       };
     } else {
       this.nextSlide = (e) => {
-        if (this.index <= this.slides.length - this.slidesToShow)
+        if (this.index <= this.slides.length - this.slidesToScroll)
           this.shiftSlide(this.slidesToScroll) || e.preventDefault();
       };
 
@@ -151,7 +151,7 @@ export default class Slider {
 
     // fix translateX while on first/last elem
     if (
-      (this.index == this.slidesToShow && this.posX2 - this.slideWidth * this.slidesToShow >= 0) ||
+      (this.index <= this.slidesToShow && this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
       (this.index == this.defaultLength && -this.posX2 >= this.slideWidth * this.slidesToShow)
     )
       return;
