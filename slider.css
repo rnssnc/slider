@@ -16,6 +16,7 @@
 }
 
 .rnssnc-slide {
+  backface-visibility: hidden;
   float: left;
   height: 100%;
   cursor: pointer;
