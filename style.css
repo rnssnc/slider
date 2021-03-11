@@ -33,18 +33,12 @@ body {
 }
 
 .slide {
-  float: left;
-  height: 100%;
-  cursor: pointer;
   display: flex;
-  flex-direction: column;
   justify-content: center;
-  /* transition: all 1s; */
-  position: relative;
-  background: #ffcf47;
-  border-radius: 2px;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 }
-
 .slide:nth-child(even) {
   background: #3cff96;
 }

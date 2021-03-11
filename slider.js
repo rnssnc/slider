@@ -1,4 +1,4 @@
-export class Slider {
+export default class Slider {
   constructor(options = {}) {
     this.slider = document.querySelector(options.slider);
     this.track = document.querySelector(options.track);
@@ -9,7 +9,7 @@ export class Slider {
     this.slides = this.track.children;
     this.transitionTime = 0.3;
 
-    this.setupClasses();
+    this.setupStyles();
 
     this.isClonesAdded = false;
     this.defaultLength = this.slides.length;
@@ -39,8 +39,6 @@ export class Slider {
         this.posX1 = e.clientX;
         this.track.setPointerCapture(e.pointerId);
 
-        console.log(e.pointerId);
-
         this.track.addEventListener('pointermove', this.handlePointerMove);
         document.addEventListener('pointerup', this.handlePointerUp);
       }
@@ -67,7 +65,9 @@ export class Slider {
     this.fitSlides(this.slides);
   };
 
-  setupClasses = () => {
+  setupStyles = () => {
+    this.wrapSlides(this.slides);
+
     this.styles = document.createElement('link');
     this.styles.rel = 'stylesheet';
     this.styles.href = 'slider.css';
@@ -77,6 +77,14 @@ export class Slider {
     this.track.classList.add('rnssnc-slides');
   };
 
+  wrapSlides = (slides) => {
+    [...slides].forEach((slide) => {
+      const div = document.createElement('div');
+      div.classList.add('rnssnc-slide');
+      div.appendChild(slide);
+      this.track.appendChild(div);
+    });
+  };
   handleInfinite = () => {
     if (this.infinite) {
       this.addClones(this.slidesToShow);
@@ -114,8 +122,6 @@ export class Slider {
     }
     this.posX1 = 0;
     this.posX2 = 0;
-
-    console.log(e.pointerId);
 
     this.track.releasePointerCapture(e.pointerId);
     document.removeEventListener('pointerup', this.handlePointerUp);
