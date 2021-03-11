@@ -39,13 +39,13 @@ body {
   height: 100%;
   width: 100%;
 }
-.slide:nth-child(even) {
+.rnssnc-slide:nth-child(even) > .slide {
   background: #3cff96;
 }
-.slide:nth-child(odd) {
+.rnssnc-slide:nth-child(odd) > .slide {
   background: #a78df5;
 }
-.slide:nth-child(3n) {
+.rnssnc-slide:nth-child(3n) > .slide {
   background: #ff8686;
 }
 /* .slide:nth-child(5) {
