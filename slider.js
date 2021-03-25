@@ -2,19 +2,27 @@ export default class Slider {
   constructor(options = {}) {
     this.slider = document.querySelector(options.slider);
     this.track = document.querySelector(options.track);
+    this.centerMode = options.centerMode;
     this.arrows = options.arrows;
     this.slidesToShow = options.slidesToShow;
     this.slidesToScroll = options.slidesToScroll;
     this.infinite = options.infinite;
+    this.variableWidth = options.variableWidth;
     this.slides = this.track.children;
     this.transitionTime = 0.3;
 
+    this.startSlide = options.startSlide || 0;
     this.setupStyles();
 
     this.isClonesAdded = false;
     this.defaultLength = this.slides.length;
 
     this.setupSlider();
+
+    if (options.responsive) {
+      this.responsive = options.responsive;
+      this.handleResposive(this.responsive);
+    }
 
     if (this.arrows) {
       this.buttonNext = document.querySelector(options.buttonNext);
@@ -33,8 +41,6 @@ export default class Slider {
         e.preventDefault(); // prevent selection start (browser action)
 
         // this.shiftX = e.clientX - this.track.getBoundingClientRect().left;
-        // console.log(e.clientX);
-        // console.log(this.track.getBoundingClientRect().left);
         this.shiftX = 0;
         this.posX1 = e.clientX;
         this.track.setPointerCapture(e.pointerId);
@@ -44,25 +50,66 @@ export default class Slider {
       }
     });
 
-    window.addEventListener('resize', this.setupSlider);
+    // window.addEventListener('resize', this.setupSlider);
   }
   setupSlider = () => {
     this.sliderWidth = this.slider.getBoundingClientRect().width;
     this.slideWidth = this.sliderWidth / this.slidesToShow;
 
+    this.currentSlideIndex = this.startSlide;
+    if (this.currentSlide) this.removeActiveState(this.currentSlide);
+    this.previousSlide;
+
     this.defaultTranslate = 0;
     this.transformValue = 0;
     this.widthWithoutClones = this.defaultLength * this.slideWidth;
-    this.index = this.slidesToShow;
+
+    if (this.centerMode) {
+      console.log('check');
+      this.index = this.startSlide + 1;
+      this.edgeLimit = this.startSlide;
+    } else {
+      this.index = this.slidesToShow;
+      this.edgeLimit = this.slidesToShow;
+    }
 
     //Different listeners for infinite
     this.handleInfinite();
+
+    this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
+    this.currentSlide = this.slides[this.currentSlideIndex];
+
+    this.addActiveState(this.currentSlide);
 
     this.setTrackWidth(this.track);
     this.track.addEventListener('transitionend', this.handleTransitionEnd);
 
     // createTrack();
-    this.fitSlides(this.slides);
+    if (!this.variableWidth) this.fitSlides(this.slides);
+  };
+
+  handleResposive = (responsiveOptions) => {
+    for (const key in responsiveOptions) {
+      const mediaQuery = window.matchMedia(
+        `screen and (max-width: ${key}px) and (min-width: ${this.responsive[key]['from']}px)`,
+      );
+      const handleTabletChange = (e) => {
+        // Check if the media query is true
+        console.log(e);
+        if (e.matches) {
+          const obj = this.responsive[key];
+          for (const key in obj) this[key] = obj[key];
+
+          this.setupSlider();
+        }
+      };
+
+      // Register event listener
+      mediaQuery.addEventListener('change', handleTabletChange);
+
+      // Initial check
+      handleTabletChange(mediaQuery);
+    }
   };
 
   setupStyles = () => {
@@ -85,10 +132,24 @@ export default class Slider {
       this.track.appendChild(div);
     });
   };
+
+  addActiveState(currentSlide) {
+    this.previousSlide = this.currentSlide;
+
+    currentSlide.classList.add('slide-active');
+    const newActiveState = new Event('newActiveState');
+    this.slider.dispatchEvent(newActiveState);
+  }
+
+  removeActiveState(currentSlide) {
+    currentSlide.classList.remove('slide-active');
+  }
+
   handleInfinite = () => {
     if (this.infinite) {
       this.addClones(this.slidesToShow);
       this.transformValue = this.defaultTranslate;
+      this.currentSlideIndex = +this.currentSlideIndex + this.slidesToShow;
 
       this.nextSlide = (e) => {
         if (this.index < this.slides.length - this.slidesToShow)
@@ -96,16 +157,34 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index >= this.slidesToScroll) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index >= this.slidesToScroll)
+          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
       };
     } else {
       this.nextSlide = (e) => {
         if (this.index <= this.slides.length - this.slidesToScroll)
           this.shiftSlide(this.slidesToScroll) || e.preventDefault();
+        else {
+          if (this.currentSlideIndex < this.slides.length - 1) {
+            this.currentSlideIndex++;
+            this.removeActiveState(this.currentSlide);
+            this.currentSlide = this.slides[this.currentSlideIndex];
+            this.addActiveState(this.currentSlide);
+          }
+        }
       };
 
       this.prevSlide = (e) => {
-        if (this.index > this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index > this.edgeLimit)
+          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        else {
+          if (this.currentSlideIndex > 0) {
+            this.currentSlideIndex--;
+            this.removeActiveState(this.currentSlide);
+            this.currentSlide = this.slides[this.currentSlideIndex];
+            this.addActiveState(this.currentSlide);
+          }
+        }
       };
     }
   };
@@ -129,15 +208,9 @@ export default class Slider {
 
   handlePointerMove = (e) => {
     // this.newLeft = e.clientX - this.shiftX - this.track.getBoundingClientRect().left;
-    // console.log(this.newLeft);
     this.posX2 = e.clientX - this.posX1;
     // this.posX1 = e.clientX;
-    // console.log(this.newLeft);
-    // console.log(this.transformValue);
 
-    // console.log('x1 ' + this.posX1);
-    // console.log('x2 ' + this.posX2);
-    // console.log(this.posX2 - this.slideWidth);
     // если указатель находится за пределами слайдера => отрегулировать "left", чтобы оставаться в пределах границ
     // if (this.newLeft < 0) {
     //   this.newLeft = 0;
@@ -146,19 +219,24 @@ export default class Slider {
     // if (this.newLeft > this.rightEdge) {
     //   this.newLeft = this.rightEdge;
     // }
-    // console.log(this.transformValue + this.newLeft);
-    // console.log(this.newLeft);
 
     // fix translateX while on first/last elem
     if (
-      (this.index <= this.slidesToShow && this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
+      (this.index <= this.slidesToShow &&
+        this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
       (this.index == this.defaultLength && -this.posX2 >= this.slideWidth * this.slidesToShow)
     )
       return;
     if (!this.infinite)
-      if (this.index === this.slides.length && this.transformValue + this.posX2 <= this.transformValue)
+      if (
+        this.index === this.slides.length &&
+        this.transformValue + this.posX2 <= this.transformValue
+      )
         return;
-      else if (this.index == this.slidesToShow && this.transformValue + this.posX2 > this.transformValue)
+      else if (
+        this.index == this.slidesToShow &&
+        this.transformValue + this.posX2 > this.transformValue
+      )
         return;
     this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
   };
@@ -170,11 +248,17 @@ export default class Slider {
         this.transformValue = this.defaultTranslate;
         this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
         this.index = this.slidesToShow;
+
+        this.currentSlideIndex = +this.startSlide + +this.slidesToShow;
       } else if (this.infinite && this.index == 0) {
         this.transformValue = -this.widthWithoutClones;
         this.track.style.transform = `translateX(${-this.widthWithoutClones}px)`;
         this.index = this.defaultLength;
+
+        this.currentSlideIndex = this.slides.length - this.slidesToShow - 2;
       }
+      this.currentSlide = this.slides[this.currentSlideIndex];
+      this.addActiveState(this.currentSlide);
     }
   };
 
@@ -198,7 +282,7 @@ export default class Slider {
 
       this.isClonesAdded = true;
     }
-    this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
+    // this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
   }
 
   setTrackWidth(track) {
@@ -217,5 +301,8 @@ export default class Slider {
     this.track.style.transition = `transform ${this.transitionTime}s`;
     this.track.style.transform = `translateX(${this.transformValue}px)`;
     this.index += count;
+
+    this.currentSlideIndex = +this.currentSlideIndex + +count;
+    this.removeActiveState(this.currentSlide);
   }
 }

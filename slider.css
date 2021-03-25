@@ -11,18 +11,18 @@
   top: 0;
   left: 0;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
+  display: flex;
+  align-items: center;
 }
 
 .rnssnc-slide {
   backface-visibility: hidden;
   float: left;
-  height: 100%;
   cursor: pointer;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  align-items: center;
   /* transition: all 1s; */
   position: relative;
   background: #ffcf47;
