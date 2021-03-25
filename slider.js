@@ -44,7 +44,7 @@ export default class Slider {
       }
     });
 
-    window.addEventListener('resize', this.setupSlider);
+    // window.addEventListener('resize', this.setupSlider);
   }
   setupSlider = () => {
     this.sliderWidth = this.slider.getBoundingClientRect().width;
@@ -96,7 +96,8 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index >= this.slidesToScroll) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index >= this.slidesToScroll)
+          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
       };
     } else {
       this.nextSlide = (e) => {
@@ -105,7 +106,8 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index > this.slidesToShow) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index > this.slidesToShow)
+          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
       };
     }
   };
@@ -151,14 +153,21 @@ export default class Slider {
 
     // fix translateX while on first/last elem
     if (
-      (this.index <= this.slidesToShow && this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
+      (this.index <= this.slidesToShow &&
+        this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
       (this.index == this.defaultLength && -this.posX2 >= this.slideWidth * this.slidesToShow)
     )
       return;
     if (!this.infinite)
-      if (this.index === this.slides.length && this.transformValue + this.posX2 <= this.transformValue)
+      if (
+        this.index === this.slides.length &&
+        this.transformValue + this.posX2 <= this.transformValue
+      )
         return;
-      else if (this.index == this.slidesToShow && this.transformValue + this.posX2 > this.transformValue)
+      else if (
+        this.index == this.slidesToShow &&
+        this.transformValue + this.posX2 > this.transformValue
+      )
         return;
     this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
   };
@@ -202,7 +211,7 @@ export default class Slider {
   }
 
   setTrackWidth(track) {
-    track.style.width = `${this.slideWidth * this.slides.length}px`;
+    track.style.width = `${this.slideWidth * this.slides.length * 2}px`;
   }
 
   fitSlides(slides) {

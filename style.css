@@ -24,20 +24,40 @@ body {
   height: 100vh;
 }
 
+.slider-wrap {
+  max-width: 1177px;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
 .slider {
-  width: 100%;
-  height: 100%;
+  width: 1200px;
+  height: 500px;
   overflow: hidden;
   position: relative;
   margin: 0 auto;
+  margin-right: -30px !important;
 }
 
+/* .rnssnc-slide {
+  margin-right: 10px;
+} */
+
 .slide {
-  display: flex;
+  padding: 0;
+  /* padding-right: 30px; */
+  /* display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center; */
+  margin-right: 40px;
   height: 100%;
   width: 100%;
+}
+
+.test {
+  width: 277px;
+  height: 300px;
+  background-color: aqua;
 }
 .rnssnc-slide:nth-child(even) > .slide {
   background: #3cff96;
