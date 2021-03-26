@@ -10,6 +10,7 @@ export default class Slider {
     this.variableWidth = options.variableWidth;
     this.slides = this.track.children;
     this.transitionTime = 0.3;
+    this.slideWidthBeforeCurrent;
 
     this.startSlide = options.startSlide || 0;
     this.setupStyles();
@@ -58,7 +59,6 @@ export default class Slider {
 
     this.currentSlideIndex = this.startSlide;
     if (this.currentSlide) this.removeActiveState(this.currentSlide);
-    this.previousSlide;
 
     this.defaultTranslate = 0;
     this.transformValue = 0;
@@ -78,7 +78,6 @@ export default class Slider {
 
     this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
     this.currentSlide = this.slides[this.currentSlideIndex];
-
     this.addActiveState(this.currentSlide);
 
     this.setTrackWidth(this.track);
@@ -120,6 +119,11 @@ export default class Slider {
     this.styles.href = 'slider.css';
     document.head.append(this.styles);
 
+    this.styles.addEventListener('load', () => {
+      this.widths = [...this.slides].map((slide) => slide.getBoundingClientRect().width);
+      console.log(this.widths);
+    });
+
     this.slider.classList.add('rnssnc-slider');
     this.track.classList.add('rnssnc-slides');
   };
@@ -134,8 +138,6 @@ export default class Slider {
   };
 
   addActiveState(currentSlide) {
-    this.previousSlide = this.currentSlide;
-
     currentSlide.classList.add('slide-active');
     const newActiveState = new Event('newActiveState');
     this.slider.dispatchEvent(newActiveState);
@@ -157,8 +159,7 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index >= this.slidesToScroll)
-          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index >= this.slidesToScroll) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
       };
     } else {
       this.nextSlide = (e) => {
@@ -175,8 +176,7 @@ export default class Slider {
       };
 
       this.prevSlide = (e) => {
-        if (this.index > this.edgeLimit)
-          this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
+        if (this.index > this.edgeLimit) this.shiftSlide(-this.slidesToScroll) || e.preventDefault();
         else {
           if (this.currentSlideIndex > 0) {
             this.currentSlideIndex--;
@@ -222,21 +222,14 @@ export default class Slider {
 
     // fix translateX while on first/last elem
     if (
-      (this.index <= this.slidesToShow &&
-        this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
+      (this.index <= this.slidesToShow && this.posX2 - this.slideWidth * this.slidesToScroll >= 0) ||
       (this.index == this.defaultLength && -this.posX2 >= this.slideWidth * this.slidesToShow)
     )
       return;
     if (!this.infinite)
-      if (
-        this.index === this.slides.length &&
-        this.transformValue + this.posX2 <= this.transformValue
-      )
+      if (this.index === this.slides.length && this.transformValue + this.posX2 <= this.transformValue)
         return;
-      else if (
-        this.index == this.slidesToShow &&
-        this.transformValue + this.posX2 > this.transformValue
-      )
+      else if (this.index == this.slidesToShow && this.transformValue + this.posX2 > this.transformValue)
         return;
     this.track.style.transform = `translateX(${this.transformValue + this.posX2}px)`;
   };
@@ -282,7 +275,7 @@ export default class Slider {
 
       this.isClonesAdded = true;
     }
-    // this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
+    this.track.style.transform = `translateX(${this.defaultTranslate}px)`;
   }
 
   setTrackWidth(track) {
@@ -296,6 +289,8 @@ export default class Slider {
   }
 
   shiftSlide(count) {
+    if (this.variableWidth) this.slideWidth = this.widths[this.currentSlideIndex + count];
+
     this.transformValue += -count * this.slideWidth;
 
     this.track.style.transition = `transform ${this.transitionTime}s`;

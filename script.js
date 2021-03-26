@@ -3,11 +3,11 @@ import Slider from './slider.js';
 const slider = new Slider({
   slider: '.slider',
   track: '.slides',
-  slidesToShow: 5,
+  slidesToShow: 2,
   slidesToScroll: 1,
   startSlide: 1,
-  // centerMode: true
-  // variableWidth: true,
+  centerMode: true,
+  variableWidth: true,
   infinite: false,
   arrows: true,
   buttonPrev: '.control.prev',

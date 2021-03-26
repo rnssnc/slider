@@ -28,3 +28,7 @@
   background: #ffcf47;
   border-radius: 2px;
 }
+
+.slide-active {
+  z-index: 2;
+}
